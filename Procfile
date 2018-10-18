@@ -1,2 +1,2 @@
-release: ENV_SILENT=true adonis serve --dev
-web: ENV_SILENT=true adonis serve --dev
+release: ENV_SILENT=true npm run start
+web: ENV_SILENT=true npm run start
