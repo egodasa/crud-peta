@@ -8,10 +8,6 @@
     "start": "node server.js",
     "test": "node ace test"
   },
-  "engines": {
-    "node": "8.9.4",
-    "npm": "6.4.1"
-  },
   "keywords": [
     "openstreetmap",
     "mapbox",
