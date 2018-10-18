@@ -1,2 +1,2 @@
-release: ENV_SILENT=true npm run start
-web: ENV_SILENT=true npm run start
+release: npm run start
+web: npm run start
