@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello Adonis</title>
+  {{ style('w3') }}
+  <style>
+    body, html {
+      height: 100%;
+    }
+    .bg { 
+        /* The image used */
+        background-image: url("background.jpg");
+    
+        /* Full height */
+        height: 100%; 
+    
+        /* Center and scale the image nicely */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+  </style>
+</head>
+<body class="w3-light-gray bg">
+  <div class="w3-card-4 w3-white" style="margin:3% 5%;">
+    <header class="w3-container w3-teal">
+      <h3>Ini Judul!</h3>
+    </header>
+    
+    <div class="w3-container">
+      @section('content')
+      @endsection
+    </div>
+    
+    <footer class="w3-container w3-teal" style="height: 50px;">
+      <div class="w3-right w3-small">
+        Thx for W3CSS
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

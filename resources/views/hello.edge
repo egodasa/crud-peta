@@ -1,0 +1,28 @@
+@layout('layout.admin')
+@section('content')
+
+@if(username)
+<p>Username : {{ username }}, Email : {{ email }}</p>
+<p>
+<a href="logout" class="w3-btn w3-blue-grey">Logout</a>
+</p>
+@else
+<form class="w3-margin" method="POST" action="login">
+  {{ csrfField() }}
+  <p>
+  <label>Username</label>
+  <input class="w3-input w3-border" type="text" name="username">
+  </p>
+  
+  <p>
+  <label>Email</label>
+  <input class="w3-input w3-border" type="text" name="email">
+  </p>
+  
+  <p>
+  <button class="w3-btn w3-blue-grey">Login</button>
+  </p>
+</form>
+@endif
+
+@endsection

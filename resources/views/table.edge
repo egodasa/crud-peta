@@ -1,0 +1,51 @@
+<table class={{ datatable.tableClass || 'w3-table-all'}}>
+  <thead>
+    <tr class={{ datatable.headingClass || 'w3-teal'}}>
+    <th>#</th>
+    
+    @each(thead in datatable.column) 
+      @if(thead.caption) 
+        <th>{{ thead.caption }}</th>
+      @endif
+    @endeach
+    
+    </tr>
+  </thead>
+  
+  <tbody>
+    @each(tdata in datatable.data) 
+    <tr class={{ datatable.rowClass || ''}}>
+      <td>{{ ((datatable.page-1)*datatable.perPage) + $loop.index + 1 }}</td>
+      
+      @each(thead in datatable.column) 
+        @if(thead.name[0] == '_')
+          <td>{{ el(thead.content($parent.tdata)) }}</td>
+        @else
+          @if(thead.caption)
+            @if(thead.format)
+              <td>{{ thead.format($parent.tdata[thead.name]) }}</td> 
+            @else
+              <td>{{ $parent.tdata[thead.name] }}</td> 
+            @endif
+          @endif
+        @endif
+      @endeach
+    </tr>
+    @else
+    <tr><td>Tidak Ada Data!</td></tr>
+    @endeach
+  </tbody>
+</table>
+<div class="w3-row w3-margin-top">
+  <div class="w3-col l4 md4 xs12">
+  <span class="w3-left">
+    <b>Halaman {{ datatable.page }} dari {{ datatable.lastPage }} ({{ datatable.total }} data)</b>
+</span>
+  </div>
+  <div class="w3-col l8 md8 xs12">
+  <span class="w3-right">
+    <a href={{ datatable.getPageUrl('prev') }} class="w3-btn w3-teal w3-small">< Sebelumnya</a>
+    <a href={{ datatable.getPageUrl('next') }} class="w3-btn w3-teal w3-small">Selanjutnya ></a>
+</span>
+  </div>
+</div>

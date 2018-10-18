@@ -1,0 +1,38 @@
+@layout('layout.admin')
+@section('content')
+<h2>Tambah Menu Baru</h2>
+<form class="w3-margin" method="POST" action="menu">
+  {{ csrfField() }}
+  <p>
+  <label>Nama Menu</label>
+  <input class="w3-input w3-border" type="text" name="nm_menu">
+  </p>
+  
+  <p>
+  <label>URL</label>
+  <input class="w3-input w3-border" type="text" name="url">
+  </p>
+  
+  <p>
+  <label>Icon</label>
+  <select class="w3-select w3-border" type="text" name="id_icon">
+    @each(icon in icons)
+      <option value={{ icon.id_icon }}>{{ icon.nm_icon }}</option>
+    @endeach
+  </select>
+  </p>
+  
+  <p>
+  <label>Akses Menu</label>
+  @each(jpengguna in jpenggunas)
+    <input class="w3-check" type="checkbox" name="id_jpengguna" value={{ jpengguna.id_jpengguna }}>
+    <label>{{ jpengguna.nm_jpengguna }}</label>
+  @endeach
+  </p>
+  
+  <p>
+  <button class="w3-btn w3-blue-grey">Login</button>
+  </p>
+</form>
+
+@endsection

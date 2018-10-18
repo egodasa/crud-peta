@@ -1,0 +1,141 @@
+@layout('layout.admin')
+
+@section('head')
+
+{{ style('css/leaflet.css') }}
+{{ script('js/leaflet.js') }}
+{{ script('js/axios.min.js') }}
+@endsection
+
+@section('content')
+<!-- Modal Detail Marker -->
+<div id="modal_item" class="w3-modal" style="display: none; z-index: 1100;">
+  <div class="w3-modal-content">
+    <div class="w3-container">
+      <span onclick="showModal('modal_item', 'none')" class="w3-closebtn w3-right">&times;</span>
+      <h3>Detail Item Peta</h3>
+    </div>
+    <div class="w3-container" id="modal_body">
+      
+    </div>
+    <div class="w3-container">
+    <form id="form_item" method="POST">
+      <p>
+        {{ csrfField() }}
+        <button id="button_delete_item" type="submit" class="w3-btn w3-teal w3-small">Hapus</button>
+        <a id="button_edit_item" class="w3-btn w3-green w3-small">Edit</a>
+        <button type="button" class="w3-btn w3-red w3-small" onclick="showModal('modal_item', 'none')">Tutup</button>
+      </p>
+    </form>
+    </div>
+  </div>
+</div>
+
+<p>
+<label>Klik item peta untuk melihat informasi peta</label>
+<div id="peta" style="width:100%; height:500px;"></div>
+</p>
+<script>
+
+// Variable
+var list_polygon = L.layerGroup([]);
+var list_polyline = L.layerGroup([])
+var list_rectangle = L.layerGroup([])
+var list_circle = L.layerGroup([]);
+var list_marker = L.layerGroup([]);
+
+var layer_overlays = {
+  "Polygon": list_polygon,
+  "Polyline": list_polyline,
+  "Rectangle": list_rectangle,
+  "Circle": list_circle,
+  "Marker": list_marker
+}
+
+
+// Inisialisasi Peta
+var map = L.map('peta').setView([-0.502106, 117.153709], 5);
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZWdvZGFzYSIsImEiOiJjamd4NWkyMmwwNms2MnhsamJvaWQ3NGZmIn0.6ok1IiPZ0sPNXmiIe-iEWA', {
+  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery Â© <a href="https://www.mapbox.com/">Mapbox</a>',
+  id: 'mapbox.streets',
+  noWrap: false
+}).addTo(map);
+
+// Method 
+
+
+// Method untuk setiap layer.
+// this disini didapat dari bind(r[x]) agar nilai dari database dapat dimasukkan ke sini.
+function eachItemPeta(feature, layer){
+  //Event untuk setiap layer
+  layer.on('click', (function(each_layer){
+    var list = []
+    var geojson = feature;
+    geojson.properties.information = this.info_item;
+    list.push('<table class="w3-table-all">')
+    list.push('<tr><td>Nama Item</td><td>' + this.nm_item + '</td></tr>');
+    list.push('<tr><td>Tipe Item</td><td>' + this.tipe_item + '</td></tr>');
+    if(geojson.properties.detail){
+      var val = geojson.properties.detail;
+      var keys = Object.keys(val);
+      var lkeys = keys.length;
+      for(var x = 0; x < lkeys; x++){
+        list.push('<tr><td>' + keys[x] + '</td><td>' + val[keys[x]] + '</td></tr>');
+      }
+    }
+    list.push('<tr><td>GeoJSON</td><td><textarea class="w3-input w3-border">' + JSON.stringify(geojson) + '</textarea></td></tr>');
+    list.push('</table>');
+    document.getElementById('modal_body').innerHTML = null
+    document.getElementById('modal_body').innerHTML = list.join('');
+    showModal('modal_item', 'block');
+    
+    document.getElementById('form_item').action = "{{ route('PetaController.index') }}/" + this.id_item + "?_method=DELETE";
+    document.getElementById('button_edit_item').href = "{{ route('PetaController.index') }}/" + this.id_item;
+  }).bind(this))
+}
+
+function showModal(id, status){
+  document.getElementById(id).style.display = status;
+}
+
+
+// Program
+var instance = axios.create();
+instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+axios.get('{{ route('PetaController.index') }}')
+  .then(function(res){
+    var r = res.data;
+    var l = r.length;
+    for(var x = 0; x < l; x++){
+      var item = null;
+      item = L.geoJSON(r[x].koordinat,{
+        onEachFeature: ((eachItemPeta).bind(r[x])),
+        style: function(geojson){
+          return geojson.properties.style
+        }
+      })
+      switch(r[x].tipe_item){
+        case 'Polygon':
+          list_polygon.addLayer(item).addTo(map);
+        break;
+        case 'Polyline':
+          list_polyline.addLayer(item).addTo(map);
+        break;
+        case 'Rectangle':
+          list_rectangle.addLayer(item).addTo(map);
+        break;
+        case 'Circle':
+          list_circle.addLayer(item).addTo(map);
+        break;
+        case 'Marker':
+          list_marker.addLayer(item).addTo(map);
+        break;
+      }
+    }
+  })
+L.control.layers(null, layer_overlays).addTo(map);
+</script>
+@endsection
