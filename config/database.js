@@ -7,7 +7,7 @@ const Env = use('Env')
 /** @type {import('@adonisjs/ignitor/src/Helpers')} */
 const Helpers = use('Helpers')
 
-const DATABASE_URL = new Url(Env.get('DATABASE_URL') || "postgres://frbcachobfczpk:16a0a78b01c2c2f1da41d502acf42583dc9e2377583f78ea0d3c69d6f27f74d3@ec2-23-21-147-71.compute-1.amazonaws.com:5432/dar75u5d6a431n")
+const DATABASE_URL = new Url(Env.get('DATABASE_URL', "postgres://frbcachobfczpk:16a0a78b01c2c2f1da41d502acf42583dc9e2377583f78ea0d3c69d6f27f74d3@ec2-23-21-147-71.compute-1.amazonaws.com:5432/dar75u5d6a431n"))
 
 module.exports = {
   /*
