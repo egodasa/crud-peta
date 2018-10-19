@@ -1,5 +1,4 @@
 'use strict'
-const Url = require('url-parse')
 
 /** @type {import('@adonisjs/framework/src/Env')} */
 const Env = use('Env')
@@ -9,7 +8,7 @@ const Helpers = use('Helpers')
 
 // Database conf from heroku env
 const parseDbUrl = require("parse-database-url");
-const DATABASE_URL = parseDbUrl(Env.get('DATABASE_URL'))
+const DATABASE_URL = parseDbUrl(Env.get('DATABASE_URL', ''))
 
 module.exports = {
   /*
