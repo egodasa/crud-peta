@@ -7,7 +7,9 @@ const Env = use('Env')
 /** @type {import('@adonisjs/ignitor/src/Helpers')} */
 const Helpers = use('Helpers')
 
-const DATABASE_URL = new Url(Env.get('DATABASE_URL', "postgres://frbcachobfczpk:16a0a78b01c2c2f1da41d502acf42583dc9e2377583f78ea0d3c69d6f27f74d3@ec2-23-21-147-71.compute-1.amazonaws.com:5432/dar75u5d6a431n"))
+// Database conf from heroku env
+const parseDbUrl = require("parse-database-url");
+const DATABASE_URL = parseDbUrl(Env.get('DATABASE_URL'))
 
 module.exports = {
   /*
@@ -75,10 +77,10 @@ module.exports = {
     client: 'pg',
     connection: {
       host: Env.get('DB_HOST', DATABASE_URL.host),
-      port: Env.get('DB_PORT', 5432),
-      user: Env.get('DB_USER', DATABASE_URL.username),
+      port: Env.get('DB_PORT', DATABASE_URL.port),
+      user: Env.get('DB_USER', DATABASE_URL.user),
       password: Env.get('DB_PASSWORD', DATABASE_URL.password),
-      database: Env.get('DB_DATABASE', DATABASE_URL.pathname.substr(1)),
+      database: Env.get('DB_DATABASE', DATABASE_URL.databaase),
       ssl: true
     }
   }
