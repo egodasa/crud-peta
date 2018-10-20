@@ -12,7 +12,7 @@ Demo : https://simple-peta-crud-yfdnbqkwiz.now.sh
 1. CRUD Item Peta seperti polygon, polyline, marker dan circle
 2. Import ke GeoJSON untuk setiap item
 3. Informasi kustom bisa ditambahkan ke layer
-4. Kustom style (masih 75%)
+4. Kustom style
 5. Hide/Show layer (pojok kanan atas peta)
 
 ## Instalasi
