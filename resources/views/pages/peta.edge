@@ -34,6 +34,7 @@
     <input type="hidden" type="text" name="koordinat" />
     <p>
     <button class="w3-btn w3-blue-grey">Simpan Perubahan</button>
+    <button type="button" class="w3-btn w3-blue" onclick="previewItemStyle()">Preview Style</button>
     </p>
   </form>
 @else
@@ -68,6 +69,7 @@
     <input type="hidden" type="text" name="koordinat" />
     <p>
     <button class="w3-btn w3-blue-grey">Simpan</button>
+    <button type="button" class="w3-btn w3-blue" onclick="previewItemStyle()">Preview Style</button>
     </p>
   </form>
 @endif
@@ -89,6 +91,14 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(map);
 
 // Method
+
+function previewItemStyle(){
+ if(currentItemObject){
+  var style = inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"));
+  console.log(style)
+  currentItemObject.setStyle(style)
+ } 
+}
 
 function getSelectedText(dom){
   return dom.options[dom.selectedIndex].text;
@@ -184,14 +194,12 @@ function inputToObject(name, value){
 
 // penggabungan nilai informasi item ke koordinat agar jadi satu geojson
 function beforeSaveItem(){
-  try{
-    var geojson = JSON.parse(document.getElementsByName("koordinat")[0].value)
-    geojson.properties.detail = inputToObject(document.getElementsByName("info_keys"), document.getElementsByName("info_value"))
-    geojson.properties.style = inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"))
-    document.getElementsByName("koordinat")[0].value = JSON.stringify(geojson)
-  }catch(e){
-    window.alert(e)
+  var geojson = currentItemObject.toGeoJSON();
+  geojson.properties = {
+    detail: inputToObject(document.getElementsByName("info_keys"), document.getElementsByName("info_value")),
+    style: inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"))
   }
+  document.getElementsByName("koordinat")[0].value = JSON.stringify(geojson)
 }
 function switchItemDrawer(name, editable = true){
   var item_style = {{ el(toJSON(tipe_item)) }}
@@ -246,8 +254,6 @@ map.on('pm:create', function(e) {
   currentItemObject = e.layer;
   currentItemObject.layer_type = currentItemName;
   
-  document.getElementsByName("koordinat")[0].value = JSON.stringify(currentItemObject.toGeoJSON())
-  
   map.pm.disableDraw(currentItemName);
   switchItemDrawer(null);
 });
@@ -271,10 +277,9 @@ map.on('pm:remove', function(e) {
   
 @else
   switchItemDrawer({{ detail.tipe_item }});
-  currentItemObject = L.geoJSON({{ el(toJSON(detail.koordinat)) }}, {
+  L.geoJSON({{ el(toJSON(detail.koordinat)) }}, {
     onEachFeature: function(feature, layer){
       // Mengembalikan value pasca edit ke form
-      document.getElementsByName("koordinat")[0].value = JSON.stringify(feature)
       document.getElementsByName("nm_item")[0].value = "{{ detail.nm_item }}"
       
       // Membuat form informasi item
@@ -282,12 +287,13 @@ map.on('pm:remove', function(e) {
       
       // Membuat form style item
       document.getElementById('style_item').appendChild(objectToInput(feature.properties.style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
-    
+      
+      // layer yang diedit dioper ke currentItemObject, agar tidak menjadi featurecollection
+      currentItemObject = layer
+    },
+    style: function(feature){
+      return feature.properties.style
     }
-  })
-  currentItemObject.on('pm:edit', function(layer){
-    var geojson = layer.target.toGeoJSON()
-    document.getElementsByName("koordinat")[0].value = JSON.stringify(geojson)
   })
   currentItemObject.layer_type = "{{ detail.tipe_item }}"
   currentItemObject.addTo(map);
