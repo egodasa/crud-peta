@@ -1,31 +1,25 @@
-# Adonis fullstack application
+## Aplikasi CRUD Peta 
 
-This is the fullstack boilerplate for AdonisJs, it comes pre-configured with.
+# Made with
+1. NodeJS (AdonisJS framework)
+2. Full VanilaJS (frontend)
+3. LeafletJS with Mapbox tile server
+4. PostgreSQL
+5. W3CSS framework
 
-1. Bodyparser
-2. Session
-3. Authentication
-4. Web security middleware
-5. CORS
-6. Edge template engine
-7. Lucid ORM
-8. Migrations and seeds
+# Fitur
+1. CRUD Item Peta seperti polygon, polyline, marker dan circle
+2. Import ke GeoJSON untuk setiap item
+3. Informasi kustom bisa ditambahkan ke layer
+4. Kustom style (masih 75%)
+5. Hide/Show layer (pojok kanan atas peta)
 
-## Setup
+# Instalasi
+1. Buat database bernama `dbgis`
+2. Import file dbgis.sql
+3. Konfigurasi database menggunakan `dotenv` untuk testing. Silahkan edit file `.env` untuk konfigurasi.
 
-Use the adonis command to install the blueprint
+# Demo
 
-```bash
-adonis new yardstick
-```
-
-or manually clone the repo and then run `npm install`.
-
-
-### Migrations
-
-Run the following command to run startup migrations.
-
-```js
-adonis migration:run
-```
+1. Buka terminal dan jalankan perintah `node server.js`
+2. Silahkan buka 127.0.0.1:3333 untuk lokal atau https://simple-peta-crud-twhhsosxsu.now.sh untuk demo online
