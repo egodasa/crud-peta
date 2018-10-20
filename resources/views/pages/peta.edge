@@ -26,12 +26,10 @@
     <p>
     <label>Informasi Item</label>
     <div id="info_item"></div>
-    <input type="hidden" name="info_item" />
     </p>
     <p>
     <label>Style Item</label>
     <div id="style_item"></div>
-    <input type="hidden" name="style_item" />
     </p>
     <input type="hidden" type="text" name="koordinat" />
     <p>
@@ -64,12 +62,10 @@
     <p>
     <label>Informasi Item</label>
     <div id="info_item"></div>
-    <input type="hidden" name="info_item" />
     </p>
     <p>
     <label>Style Item</label>
     <div id="style_item"></div>
-    <input type="hidden" name="style_item" />
     </p>
     <input type="hidden" type="text" name="koordinat" />
     <p>
@@ -96,23 +92,80 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 // Method
 
-function objectToInput(o, input_name, input_value, head1, head2){
+function objectToInput(o, input_name, input_value, head1, head2, table_id, delete_able = true){
   var keys = Object.keys(o);
   var l = keys.length;
-  var list = []
-  list.push('<table class="w3-table-all">')
-  list.push('<tr>')
-  list.push('<th class="w3-teal">' + head1 +'</th>')
-  list.push('<th class="w3-teal">' + head2 +'</th>')
-  list.push('</tr>')
-  for(var x = 0; x < l; x++){
-    list.push('<tr>')
-    list.push('<td><input type="text" name="' + input_name + '" value="' + keys[x] + '" class="w3-input w3-border" /> </td>')
-    list.push('<td><input type="text" name="' + input_value + '" value="' + o[keys[x]] + '" class="w3-input w3-border" /> </td>')
-    list.push('</tr>')
+  var table = document.createElement("table");
+  table.setAttribute("class", "w3-table-all");
+  table.setAttribute("id", table_id);
+  
+  var thead = table.insertRow(0);
+  thead.setAttribute("class", "w3-teal")
+  
+  var thead1 = thead.insertCell();
+  thead1.innerHTML = head1
+  
+  var thead2 = thead.insertCell();
+  thead2.innerHTML = head2
+  
+  if(delete_able){
+    var thead3 = thead.insertCell();
+    thead3.innerHTML = "Aksi"
   }
-  list.push('</table>')
-  return list.join('')
+  
+  // method untuk menambah row
+  function addRow(name1, val1, name2, val2, index = -1){
+    var tcontent = table.insertRow(index);
+    
+    var tcontent1 = tcontent.insertCell();
+    tcontent1.innerHTML = '<input type="text" name="' + name1 + '" value="' + val1 + '" class="w3-input w3-border" />';
+    
+    var tcontent2 = tcontent.insertCell();
+    tcontent2.innerHTML = '<input type="text" name="' + name2 + '" value="' + val2 + '" class="w3-input w3-border" />';
+    
+    if(delete_able){
+      var tcontent3 = tcontent.insertCell();
+      var button = document.createElement("button")
+      button.innerHTML = " X "
+      button.setAttribute("type", "button")
+      button.setAttribute("class", "w3-btn w3-small w3-red")
+      button.onclick = function(){
+        deleteRow(this);
+      }
+      tcontent3.appendChild(button);
+    }
+  }
+  
+  for(var x = 0; x < l; x++){
+    addRow(input_name, keys[x], input_value, o[keys[x]])
+  }
+  
+  if(delete_able){
+    var cellCount = table.rows[0].cells.length;
+  
+    var addRowButton = document.createElement("button")
+    addRowButton.setAttribute("class", "w3-btn w3-small w3-teal")
+    addRowButton.setAttribute("type", "button")
+    addRowButton.innerHTML = " <b> Baris Baru </b>"
+    
+    var tcontent4 = table.insertRow()
+  
+    var tcontent41 = tcontent4.insertCell()
+    tcontent41.setAttribute("colspan", cellCount)
+    tcontent41.appendChild(addRowButton)
+    
+    addRowButton.onclick = function(){
+      addRow(input_name, "Nama", input_value, "Nilai", table.rows.length - 1)
+    }
+  }
+  
+  return table
+}
+
+function deleteRow(r){
+  var i = r.parentNode.parentNode;
+  var k = i.rowIndex;
+  i.parentNode.parentNode.deleteRow(k);
 }
 
 // Parse 2 input yang bersebelahan menjadi object json
@@ -210,10 +263,10 @@ map.on('pm:remove', function(e) {
   switchItemDrawer('Polygon');
   
   // Membuat form informasi item
-  document.getElementById('info_item').innerHTML = objectToInput({nama: "sebuah peta", ukuran: 2}, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi");
+  document.getElementById('info_item').appendChild(objectToInput({nama: "sebuah peta", ukuran: 2}, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));
   
   // Membuat form style item
-  document.getElementById('style_item').innerHTML = objectToInput({color: "#FF0000", fillColor: "#FFF000", fillOpacity: 0.2}, "style_keys", "style_value", "Nama Style", "Informasi Style");
+  document.getElementById('style_item').appendChild(objectToInput({color: "#FF0000", fillColor: "#FFF000", fillOpacity: 0.2}, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
 
 @else
   switchItemDrawer('Edit Mode');
@@ -224,10 +277,10 @@ map.on('pm:remove', function(e) {
       document.getElementsByName("nm_item")[0].value = "{{ detail.nm_item }}"
       
       // Membuat form informasi item
-      document.getElementById('info_item').innerHTML = objectToInput(feature.properties.detail, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi");
+      document.getElementById('info_item').appendChild(objectToInput(feature.properties.detail, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));
       
       // Membuat form style item
-      document.getElementById('style_item').innerHTML = objectToInput(feature.properties.style, "style_keys", "style_value", "Nama Style", "Informasi Style");
+      document.getElementById('style_item').appendChild(objectToInput(feature.properties.style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
     
     }
   })
