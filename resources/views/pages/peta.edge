@@ -47,11 +47,9 @@
     <p>
     <label>Jenis Item</label>
     <select class="w3-select w3-border" name="tipe_item">
-      <option value="Polygon">Polygon</option>
-      <option value="Polyline">Line</option>
-      <option value="Rectangle">Rectangle</option>
-      <option value="Marker">Marker</option>
-      <option value="Circle">Circle</option>
+      @each(titem in tipe_item)
+        <option value="{{ titem.id_titem }}">{{ titem.nm_titem }}</option>
+      @endeach
     </select>
     </p>
     
@@ -92,6 +90,10 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 // Method
 
+function getSelectedText(dom){
+  return dom.options[dom.selectedIndex].text;
+}
+
 function objectToInput(o, input_name, input_value, head1, head2, table_id, delete_able = true){
   var keys = Object.keys(o);
   var l = keys.length;
@@ -130,7 +132,9 @@ function objectToInput(o, input_name, input_value, head1, head2, table_id, delet
       button.setAttribute("type", "button")
       button.setAttribute("class", "w3-btn w3-small w3-red")
       button.onclick = function(){
-        deleteRow(this);
+        var i = this.parentNode.parentNode;
+        var k = i.rowIndex;
+        i.parentNode.parentNode.deleteRow(k);
       }
       tcontent3.appendChild(button);
     }
@@ -162,11 +166,6 @@ function objectToInput(o, input_name, input_value, head1, head2, table_id, delet
   return table
 }
 
-function deleteRow(r){
-  var i = r.parentNode.parentNode;
-  var k = i.rowIndex;
-  i.parentNode.parentNode.deleteRow(k);
-}
 
 // Parse 2 input yang bersebelahan menjadi object json
 // Nama input harus sama
@@ -194,7 +193,8 @@ function beforeSaveItem(){
     window.alert(e)
   }
 }
-function switchItemDrawer(name){
+function switchItemDrawer(name, editable = true){
+  var item_style = {{ el(toJSON(tipe_item)) }}
   map.pm.disableDraw(currentItem);
   currentItemName = name;
   map.pm.removeControls();
@@ -206,9 +206,17 @@ function switchItemDrawer(name){
     drawPolygon: false, // adds button to draw a polygon
     drawCircle: false, // adds button to draw a cricle
     cutPolygon: false, // adds button to cut a hole in a polygon
-    editMode: false, // adds button to toggle edit mode for all layers
-    removalMode: true, // adds a button to remove layers
-};
+    editMode: editable, // adds button to toggle edit mode for all layers
+    removalMode: !editable, // adds a button to remove layers
+  };
+  for(var x = 0; x < item_style.length; x++){
+    if(item_style[x].nm_titem == name){
+      // Membuat form style item
+      document.getElementById('style_item').innerHTML = null
+      document.getElementById('style_item').appendChild(objectToInput(item_style[x].style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));   
+    }
+  }
+
   switch(name){
     case 'Polygon':
       options.drawPolygon = true
@@ -224,10 +232,6 @@ function switchItemDrawer(name){
     break;
     case 'Marker':
       options.drawMarker = true
-    break;
-    case 'Edit Mode':
-      options.removalMode = false
-      options.editMode = true
     break;
   }
   map.pm.addControls(options);
@@ -257,19 +261,16 @@ map.on('pm:remove', function(e) {
   // Event listener
   document.getElementsByName("tipe_item")[0].addEventListener("change", function(){
     if(currentItemObject) map.removeLayer(currentItemObject);
-    switchItemDrawer(this.value);
+    switchItemDrawer(getSelectedText(this));
   });
   // Program
   switchItemDrawer('Polygon');
   
   // Membuat form informasi item
-  document.getElementById('info_item').appendChild(objectToInput({nama: "sebuah peta", ukuran: 2}, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));
+  document.getElementById('info_item').appendChild(objectToInput({Ibukota: "Jakarta"}, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));
   
-  // Membuat form style item
-  document.getElementById('style_item').appendChild(objectToInput({color: "#FF0000", fillColor: "#FFF000", fillOpacity: 0.2}, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
-
 @else
-  switchItemDrawer('Edit Mode');
+  switchItemDrawer({{ detail.tipe_item }});
   currentItemObject = L.geoJSON({{ el(toJSON(detail.koordinat)) }}, {
     onEachFeature: function(feature, layer){
       // Mengembalikan value pasca edit ke form

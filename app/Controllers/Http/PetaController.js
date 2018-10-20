@@ -1,18 +1,20 @@
 'use strict'
 
 const Peta = use('App/Models/Peta')
+const Db = use('Database')
 
 class PetaController {
   async index({view, request, response, params}){
     let detail = {}
+    const TipeItem = await Db.select().from('tbl_tipe_item');
     if(request.ajax()){
-      const peta = await Peta.all();
-      return response.json(peta.toJSON());
+      const peta = await Db.select().from('daftar_item');
+      return response.json(peta);
     }else{
       if(params){
         detail = await Peta.find(params.id);
       }
-      return view.render('pages.peta', {detail: detail});
+      return view.render('pages.peta', {detail: detail, tipe_item: TipeItem});
     }
   }
   async store({request, view, response}){
@@ -21,7 +23,7 @@ class PetaController {
     const peta = new Peta();
     peta.nm_item = req.nm_item;
     peta.koordinat = req.koordinat;
-    peta.tipe_item = req.tipe_item;
+    peta.id_titem = req.tipe_item;
     await peta.save();
     response.redirect('/peta');
   }
