@@ -56,13 +56,14 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(map);
 
 var layer_overlays = {
-  "Polygon": L.layerGroup().addTo(map),
-  "Polyline": L.layerGroup().addTo(map),
-  "Rectangle": L.layerGroup().addTo(map),
-  "Circle": L.layerGroup().addTo(map),
-  "Marker": L.layerGroup().addTo(map)
+  "Polygon": L.featureGroup().addTo(map),
+  "Polyline": L.featureGroup().addTo(map),
+  "Rectangle": L.featureGroup().addTo(map),
+  "Circle": L.featureGroup().addTo(map),
+  "Marker": L.featureGroup().addTo(map)
 }
 var layer_control = null
+var list_bounds = []
 
 // Method 
 
@@ -129,8 +130,18 @@ function showItemPeta(url){
           }
         })
       }
+      map.fitBounds([
+        layer_overlays.Polygon.getBounds(),
+        layer_overlays.Polyline.getBounds(),
+        layer_overlays.Circle.getBounds(),
+        layer_overlays.Rectangle.getBounds(),
+        layer_overlays.Marker.getBounds()
+      ])
     })
-  // layer_control = L.control.layers(null, layer_overlays).addTo(map);
+  if(layer_control){
+    map.removeControl(layer_control)
+  }
+  layer_control = L.control.layers(null, layer_overlays).addTo(map);
 }
 
 // Program
@@ -138,8 +149,11 @@ showItemPeta("{{ route('PetaController.index') }}");
 
 // Event 
 document.getElementsByName('kategori_item')[0].onchange = function(){
-  console.log(this)
-  showItemPeta("/peta/kategori/"+this.value)
+  if(this.value == "0"){
+    showItemPeta("/peta")
+  }else{
+    showItemPeta("/peta/kategori/"+this.value)  
+  }
 }
 </script>
 @endsection

@@ -15,12 +15,7 @@
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
-
 Route.get('/', 'IndexController.index')
-Route.get('/icon/:id?', 'IconController.index')
-Route.post('/icon', 'IconController.store')
-Route.put('/icon/:id/edit', 'IconController.update')
-Route.delete('/icon/:id', 'IconController.remove')
 
 Route.get('/peta/:id?', 'PetaController.index')
 Route.post('/peta', 'PetaController.store')
