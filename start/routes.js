@@ -16,7 +16,7 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.on('/').render('pages/index')
+Route.get('/', 'IndexController.index')
 Route.get('/icon/:id?', 'IconController.index')
 Route.post('/icon', 'IconController.store')
 Route.put('/icon/:id/edit', 'IconController.update')
@@ -26,3 +26,9 @@ Route.get('/peta/:id?', 'PetaController.index')
 Route.post('/peta', 'PetaController.store')
 Route.put('/peta/:id/edit', 'PetaController.update')
 Route.delete('/peta/:id', 'PetaController.remove')
+Route.get('/peta/kategori/:id', 'PetaController.petaByKategori')
+
+Route.get('/kategori/:id?', 'KategoriItemController.index')
+Route.post('/kategori', 'KategoriItemController.store')
+Route.put('/kategori/:id/edit', 'KategoriItemController.update')
+Route.delete('/kategori/:id', 'KategoriItemController.remove')

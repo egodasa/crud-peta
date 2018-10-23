@@ -1,0 +1,32 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2 id="judul_form">Tambah Kategori Peta</h2>
+<form name="form" class="w3-margin" method="POST" action="{{ route('KategoriItemController.index') }}">
+  {{ csrfField() }}
+  <p>
+    <label>Nama Kategori</label>
+    <input type="text" class="w3-input w3-border" name="nm_kitem" />
+  </p>
+  <p>
+    <label>Detail Kategori</label>
+    <textarea class="w3-input w3-border" name="detail"></textarea>
+  </p>
+  <p>
+  <button class="w3-btn w3-blue-grey">Simpan</button>
+  </p>
+</form>
+@if(!detail.id_kitem)
+  @!component('table', {datatable: datatable})
+@else
+<script>
+  document.getElementById('judul_form').innerHTML = "Edit Kategori Peta";
+  document.form.action = "{{ route('KategoriItemController.update', {id: detail.id_kitem}) }}?_method=PUT";
+  document.getElementsByName('nm_kitem')[0].value = "{{ detail.nm_kitem }}";
+  document.getElementsByName('detail')[0].innerHTML = "{{ detail.detail }}";
+</script>
+@endif
+@endsection

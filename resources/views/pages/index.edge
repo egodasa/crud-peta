@@ -33,26 +33,18 @@
 
 <p>
 <label>Klik item peta untuk melihat informasi peta</label>
+<p>
+  <label>Tampilkan item peta berdasarkan kategori:</label>
+  <select class="w3-select w3-border w3-small" name="kategori_item">
+    <option value="0" selected disable>-- Semua Kategori --</option>
+    @each(kitem in kategori_item)
+      <option value="{{ kitem.id_kitem }}">{{ kitem.nm_kitem }}</option>
+    @endeach
+  </select>
+  </p>
 <div id="peta" style="width:100%; height:500px;"></div>
 </p>
 <script>
-
-// Variable
-var list_polygon = L.layerGroup([]);
-var list_polyline = L.layerGroup([])
-var list_rectangle = L.layerGroup([])
-var list_circle = L.layerGroup([]);
-var list_marker = L.layerGroup([]);
-
-var layer_overlays = {
-  "Polygon": list_polygon,
-  "Polyline": list_polyline,
-  "Rectangle": list_rectangle,
-  "Circle": list_circle,
-  "Marker": list_marker
-}
-
-
 // Inisialisasi Peta
 var map = L.map('peta').setView([-0.502106, 117.153709], 5);
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZWdvZGFzYSIsImEiOiJjamd4NWkyMmwwNms2MnhsamJvaWQ3NGZmIn0.6ok1IiPZ0sPNXmiIe-iEWA', {
@@ -63,12 +55,24 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
   noWrap: false
 }).addTo(map);
 
+var layer_overlays = {
+  "Polygon": L.layerGroup().addTo(map),
+  "Polyline": L.layerGroup().addTo(map),
+  "Rectangle": L.layerGroup().addTo(map),
+  "Circle": L.layerGroup().addTo(map),
+  "Marker": L.layerGroup().addTo(map)
+}
+var layer_control = null
+
 // Method 
 
 
 // Method untuk setiap layer.
 // this disini didapat dari bind(r[x]) agar nilai dari database dapat dimasukkan ke sini.
 function eachItemPeta(feature, layer){
+  // Nama tipe layer bersifat baku dan sama dengan penulisan leafletjs. cek variabel layer_overlays dibagian atas
+  layer_overlays[this.tipe_item].addLayer(layer);
+  
   //Event untuk setiap layer
   layer.on('click', (function(each_layer){
     var list = []
@@ -100,42 +104,42 @@ function showModal(id, status){
   document.getElementById(id).style.display = status;
 }
 
+//ini method async
+//untuk menampilkan layer peta 
+function showItemPeta(url){
+  // Hapus semua layer yang ada terlebih dahulu
+  var keys = Object.keys(layer_overlays);
+  var lkeys = keys.length;
+  for(var x = 0; x < lkeys; x++){
+    layer_overlays[keys[x]].clearLayers()
+  }
+  var instance = axios.create();
+  instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+  
+  axios.get(url)
+    .then(function(res){
+      var r = res.data;
+      var l = r.length;
+      for(var x = 0; x < l; x++){
+        var item = null;
+        item = L.geoJSON(r[x].koordinat,{
+          onEachFeature: ((eachItemPeta).bind(r[x])),
+          style: function(geojson){
+            return geojson.properties.style
+          }
+        })
+      }
+    })
+  // layer_control = L.control.layers(null, layer_overlays).addTo(map);
+}
 
 // Program
-var instance = axios.create();
-instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+showItemPeta("{{ route('PetaController.index') }}");
 
-axios.get('{{ route('PetaController.index') }}')
-  .then(function(res){
-    var r = res.data;
-    var l = r.length;
-    for(var x = 0; x < l; x++){
-      var item = null;
-      item = L.geoJSON(r[x].koordinat,{
-        onEachFeature: ((eachItemPeta).bind(r[x])),
-        style: function(geojson){
-          return geojson.properties.style
-        }
-      })
-      switch(r[x].tipe_item){
-        case 'Polygon':
-          list_polygon.addLayer(item).addTo(map);
-        break;
-        case 'Polyline':
-          list_polyline.addLayer(item).addTo(map);
-        break;
-        case 'Rectangle':
-          list_rectangle.addLayer(item).addTo(map);
-        break;
-        case 'Circle':
-          list_circle.addLayer(item).addTo(map);
-        break;
-        case 'Marker':
-          list_marker.addLayer(item).addTo(map);
-        break;
-      }
-    }
-  })
-L.control.layers(null, layer_overlays).addTo(map);
+// Event 
+document.getElementsByName('kategori_item')[0].onchange = function(){
+  console.log(this)
+  showItemPeta("/peta/kategori/"+this.value)
+}
 </script>
 @endsection
