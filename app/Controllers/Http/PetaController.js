@@ -7,6 +7,7 @@ class PetaController {
   async index({view, request, response, params}){
     let detail = {}
     const TipeItem = await Db.select().from('tbl_tipe_item');
+    const KategoriItem = await Db.select().from('tbl_kategori_item');
     if(request.ajax()){
       const peta = await Db.select().from('daftar_item');
       return response.json(peta);
@@ -14,7 +15,7 @@ class PetaController {
       if(params){
         detail = await Peta.find(params.id);
       }
-      return view.render('pages.peta', {detail: detail, tipe_item: TipeItem});
+      return view.render('pages.peta', {detail: detail, tipe_item: TipeItem, kategori_item: KategoriItem});
     }
   }
   async store({request, view, response}){
@@ -24,6 +25,7 @@ class PetaController {
     peta.nm_item = req.nm_item;
     peta.koordinat = req.koordinat;
     peta.id_titem = req.tipe_item;
+    peta.id_kitem = req.kategori_item;
     await peta.save();
     response.redirect('/peta');
   }
@@ -32,7 +34,8 @@ class PetaController {
     await Peta.query()
       .where(Peta.primaryKey, params.id)
       .update({
-        nm_item: req.nm_icon,
+        nm_item: req.nm_item,
+        id_kitem: req.kategori_item,
         koordinat: req.koordinat
       });
     response.redirect('/');
@@ -42,6 +45,12 @@ class PetaController {
       .where(Peta.primaryKey, params.id)
       .delete();
     response.redirect('/');
+  }
+  async petaByKategori({params, response, request}){
+    if(request.ajax()){
+      const petaByKategori = await Db.select().from('daftar_item').where({id_kitem: params.id});
+      return response.json(petaByKategori);
+    }
   }
 }
 

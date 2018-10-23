@@ -10,41 +10,24 @@
 @endsection
 
 @section('content')
-@if(detail.id_item)
-  <h2>Edit Item Peta</h2>
-  <form class="w3-margin" onsubmit="beforeSaveItem()" method="POST" action="{{ route('PetaController.update', {id: detail.id_item}) }}?_method=PUT">
-    {{ csrfField() }}
-    <p>
-      <label>Nama Item Peta</label>
-      <input type="text" class="w3-input w3-border" name="nm_item" />
-    </p>
-    
-    <p>
-    <label>Item Peta (Klik ikon sebelah kanan atas pada peta untuk mengedit)</label>
-    <div id="peta" style="width:100%; height:300px;"></div>
-    </p>
-    <p>
-    <label>Informasi Item</label>
-    <div id="info_item"></div>
-    </p>
-    <p>
-    <label>Style Item</label>
-    <div id="style_item"></div>
-    </p>
-    <input type="hidden" type="text" name="koordinat" />
-    <p>
-    <button class="w3-btn w3-blue-grey">Simpan Perubahan</button>
-    <button type="button" class="w3-btn w3-blue" onclick="previewItemStyle()">Preview Style</button>
-    </p>
-  </form>
-@else
-  <h2>Tambah Item Peta Baru</h2>
-  <form class="w3-margin" method="POST" onsubmit="beforeSaveItem()" action="{{ route('PetaController.index') }}">
-    {{ csrfField() }}
-    <p>
-      <label>Nama Item Peta</label>
-      <input type="text" class="w3-input w3-border" name="nm_item" />
-    </p>
+<h2 id="judul_form">Tambah Item Peta Baru</h2>
+<form name="form" class="w3-margin" method="POST" onsubmit="beforeSaveItem()" action="{{ route('PetaController.index') }}">
+  {{ csrfField() }}
+  <p>
+    <label>Nama Item Peta</label>
+    <input type="text" class="w3-input w3-border" name="nm_item" />
+  </p>
+  
+  <p>
+  <label>Kategori Item</label>
+  <select class="w3-select w3-border" name="kategori_item">
+    @each(kitem in kategori_item)
+      <option value="{{ kitem.id_kitem }}">{{ kitem.nm_kitem }}</option>
+    @endeach
+  </select>
+  </p>
+  
+  @if(!detail.id_item)
     <p>
     <label>Jenis Item</label>
     <select class="w3-select w3-border" name="tipe_item">
@@ -53,26 +36,26 @@
       @endeach
     </select>
     </p>
-    
-    <p>
+  @endif
+  
+  <p>
     <label>Item Peta (Klik ikon sebelah kanan atas pada peta)</label>
     <div id="peta" style="width:100%; height:300px;"></div>
-    </p>
-    <p>
+  </p>
+  <p>
     <label>Informasi Item</label>
     <div id="info_item"></div>
-    </p>
-    <p>
+  </p>
+  <p>
     <label>Style Item</label>
     <div id="style_item"></div>
-    </p>
+  </p>
     <input type="hidden" type="text" name="koordinat" />
-    <p>
+  <p>
     <button class="w3-btn w3-blue-grey">Simpan</button>
     <button type="button" class="w3-btn w3-blue" onclick="previewItemStyle()">Preview Style</button>
-    </p>
-  </form>
-@endif
+  </p>
+</form>
 
 <script>
 
@@ -279,8 +262,16 @@ map.on('pm:remove', function(e) {
   switchItemDrawer({{ detail.tipe_item }});
   L.geoJSON({{ el(toJSON(detail.koordinat)) }}, {
     onEachFeature: function(feature, layer){
+      
       // Mengembalikan value pasca edit ke form
       document.getElementsByName("nm_item")[0].value = "{{ detail.nm_item }}"
+      document.getElementsByName('kategori_item')[0].value = "{{ detail.id_kitem }}"
+      
+      // Mengganti action form keupdate
+      document.form.action = "{{ route('PetaController.update', {id: detail.id_item}) }}?_method=PUT"
+      
+      // ganti judul form
+      document.getElementById('judul_form').innerHTML = "Edit Item Peta";
       
       // Membuat form informasi item
       document.getElementById('info_item').appendChild(objectToInput(feature.properties.detail, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));

@@ -1,5 +1,5 @@
 # Aplikasi CRUD Peta 
-Demo : https://simple-peta-crud-gfivtcarwo.now.sh
+Demo : https://simple-peta-crud-kmyhflgvrb.now.sh/
 
 ## Made with
 1. NodeJS (AdonisJS framework)
@@ -14,6 +14,7 @@ Demo : https://simple-peta-crud-gfivtcarwo.now.sh
 3. Informasi kustom bisa ditambahkan ke layer
 4. Kustom style
 5. Hide/Show layer (pojok kanan atas peta)
+6. Menampilkan item peta berdasarkan kategori
 
 ## Instalasi
 1. Buat database bernama `dbgis`
@@ -23,4 +24,4 @@ Demo : https://simple-peta-crud-gfivtcarwo.now.sh
 ## Demo
 
 1. Buka terminal dan jalankan perintah `node server.js`
-2. Silahkan buka 127.0.0.1:3333 untuk lokal atau https://simple-peta-crud-gfivtcarwo.now.sh untuk demo online
+2. Silahkan buka 127.0.0.1:3333 untuk lokal atau https://simple-peta-crud-kmyhflgvrb.now.sh/ untuk demo online
