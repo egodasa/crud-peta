@@ -71,34 +71,50 @@ var list_bounds = []
 // Method untuk setiap layer.
 // this disini didapat dari bind(r[x]) agar nilai dari database dapat dimasukkan ke sini.
 function eachItemPeta(feature, layer){
-  // Nama tipe layer bersifat baku dan sama dengan penulisan leafletjs. cek variabel layer_overlays dibagian atas
-  layer_overlays[this.tipe_item].addLayer(layer);
   
-  //Event untuk setiap layer
-  layer.on('click', (function(each_layer){
-    var list = []
-    var geojson = feature;
-    geojson.properties.information = this.info_item;
-    list.push('<table class="w3-table-all">')
-    list.push('<tr><td>Nama Item</td><td>' + this.nm_item + '</td></tr>');
-    list.push('<tr><td>Tipe Item</td><td>' + this.tipe_item + '</td></tr>');
-    if(geojson.properties.detail){
-      var val = geojson.properties.detail;
-      var keys = Object.keys(val);
-      var lkeys = keys.length;
-      for(var x = 0; x < lkeys; x++){
-        list.push('<tr><td>' + keys[x] + '</td><td>' + val[keys[x]] + '</td></tr>');
-      }
-    }
-    list.push('<tr><td>GeoJSON</td><td><textarea class="w3-input w3-border">' + JSON.stringify(geojson) + '</textarea></td></tr>');
-    list.push('</table>');
-    document.getElementById('modal_body').innerHTML = null
-    document.getElementById('modal_body').innerHTML = list.join('');
-    showModal('modal_item', 'block');
+  // cek apakah layer termasuk lingkaran atau tidak
+  if(feature.properties.radius){
+    var circle = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
+    circle.setStyle(feature.properties.style);
     
-    document.getElementById('form_item').action = "{{ route('PetaController.index') }}/" + this.id_item + "?_method=DELETE";
-    document.getElementById('button_edit_item').href = "{{ route('PetaController.index') }}/" + this.id_item;
-  }).bind(this))
+    // event lingkaran
+    circle.on('click', (modalDetailPeta).bind(this))
+    
+    layer_overlays[this.tipe_item].addLayer(circle);
+  }else{
+    //Event untuk setiap layer
+    layer.on('click', (modalDetailPeta).bind(this))
+    
+    // Nama tipe layer bersifat baku dan sama dengan penulisan leafletjs. cek variabel layer_overlays dibagian atas
+    layer_overlays[this.tipe_item].addLayer(layer);
+  }
+}
+
+// Method untuk menjalankan modal detail disetiap klik pada item
+// this disini merujuk ke r[x], pada method eachItemPeta(), yang merupakan nilai row dari database
+function modalDetailPeta(each_layer){
+  var list = []
+  // koordinat menyimpan geojson didatabase
+  var geojson = this.koordinat;
+  list.push('<table class="w3-table-all">')
+  list.push('<tr><td>Nama Item</td><td>' + this.nm_item + '</td></tr>');
+  list.push('<tr><td>Tipe Item</td><td>' + this.tipe_item + '</td></tr>');
+  if(geojson.properties.detail){
+    var val = geojson.properties.detail;
+    var keys = Object.keys(val);
+    var lkeys = keys.length;
+    for(var x = 0; x < lkeys; x++){
+      list.push('<tr><td>' + keys[x] + '</td><td>' + val[keys[x]] + '</td></tr>');
+    }
+  }
+  list.push('<tr><td>GeoJSON</td><td><textarea class="w3-input w3-border">' + JSON.stringify(geojson) + '</textarea></td></tr>');
+  list.push('</table>');
+  document.getElementById('modal_body').innerHTML = null
+  document.getElementById('modal_body').innerHTML = list.join('');
+  showModal('modal_item', 'block');
+  
+  document.getElementById('form_item').action = "{{ route('PetaController.index') }}/" + this.id_item + "?_method=DELETE";
+  document.getElementById('button_edit_item').href = "{{ route('PetaController.index') }}/" + this.id_item;
 }
 
 function showModal(id, status){

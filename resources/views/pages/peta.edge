@@ -182,6 +182,11 @@ function beforeSaveItem(){
     detail: inputToObject(document.getElementsByName("info_keys"), document.getElementsByName("info_value")),
     style: inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"))
   }
+  
+  //Jika item lingkaran, maka tambah radius di properties
+  if(currentItemName == "Circle"){
+    geojson.properties.radius = currentItemObject.getRadius()
+  }
   document.getElementsByName("koordinat")[0].value = JSON.stringify(geojson)
 }
 function switchItemDrawer(name, editable = true){
@@ -228,26 +233,16 @@ function switchItemDrawer(name, editable = true){
   map.pm.addControls(options);
 }
 
-function getMapItemValue(itemObject){
-  var result = itemObject.toGeoJSON()
-  return result.coordinates;
-}
-
 map.on('pm:create', function(e) {
   currentItemObject = e.layer;
-  currentItemObject.layer_type = currentItemName;
-  
-  map.pm.disableDraw(currentItemName);
-  switchItemDrawer(null);
 });
 
 map.on('pm:remove', function(e) {
-  switchItemDrawer(currentItemObject.layer_type);
   currentItemObject = null;
 });
 
 @if(!detail.id_item)
-  // Event listener
+  // Event listener agar mengubah peta sesuai dengan tipe item
   document.getElementsByName("tipe_item")[0].addEventListener("change", function(){
     if(currentItemObject) map.removeLayer(currentItemObject);
     switchItemDrawer(getSelectedText(this));
@@ -279,15 +274,21 @@ map.on('pm:remove', function(e) {
       // Membuat form style item
       document.getElementById('style_item').appendChild(objectToInput(feature.properties.style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
       
+      // ubah layer ke lingkaran jika tipenya adalah circe, geojson tidak bisa menyimpan circle
+      if(feature.properties.radius){
+        currentItemObject = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
+        currentItemObject.setStyle(feature.properties.style);
+      }else{
+        currentItemObject = layer
+      }
+      
       // layer yang diedit dioper ke currentItemObject, agar tidak menjadi featurecollection
-      currentItemObject = layer
+      currentItemObject.addTo(map);      
     },
     style: function(feature){
       return feature.properties.style
     }
   })
-  currentItemObject.layer_type = "{{ detail.tipe_item }}"
-  currentItemObject.addTo(map);
   
 @endif
 
