@@ -94,8 +94,8 @@ function eachItemPeta(feature, layer){
 // this disini merujuk ke r[x], pada method eachItemPeta(), yang merupakan nilai row dari database
 function modalDetailPeta(each_layer){
   var list = []
-  // koordinat menyimpan geojson didatabase
-  var geojson = this.koordinat;
+  // geojson menyimpan geojson didatabase
+  var geojson = this.geojson;
   list.push('<table class="w3-table-all">')
   list.push('<tr><td>Nama Item</td><td>' + this.nm_item + '</td></tr>');
   list.push('<tr><td>Tipe Item</td><td>' + this.tipe_item + '</td></tr>');
@@ -139,7 +139,7 @@ function showItemPeta(url){
       var l = r.length;
       for(var x = 0; x < l; x++){
         var item = null;
-        item = L.geoJSON(r[x].koordinat,{
+        item = L.geoJSON(r[x].geojson,{
           onEachFeature: ((eachItemPeta).bind(r[x])),
           style: function(geojson){
             return geojson.properties.style

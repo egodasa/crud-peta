@@ -50,7 +50,7 @@
     <label>Style Item</label>
     <div id="style_item"></div>
   </p>
-    <input type="hidden" type="text" name="koordinat" />
+    <input type="hidden" type="text" name="geojson" />
   <p>
     <button class="w3-btn w3-blue-grey">Simpan</button>
     <button type="button" class="w3-btn w3-blue" onclick="previewItemStyle()">Preview Style</button>
@@ -60,7 +60,6 @@
 <script>
 
 // Variable
-var currentItem = "Poly";
 var currentItemObject = null;
 
 // Inisialisasi Peta
@@ -78,8 +77,13 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 function previewItemStyle(){
  if(currentItemObject){
   var style = inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"));
-  console.log(style)
-  currentItemObject.setStyle(style)
+  if(currentItemName == "Marker"){
+    if(style.iconUrl != ""){
+      currentItemObject.setIcon(L.icon(style))
+    }
+  }else{
+    currentItemObject.setStyle(style)
+  }
  } 
 }
 
@@ -175,7 +179,7 @@ function inputToObject(name, value){
   return result;
 }
 
-// penggabungan nilai informasi item ke koordinat agar jadi satu geojson
+// penggabungan nilai informasi item ke geojson agar jadi satu geojson
 function beforeSaveItem(){
   var geojson = currentItemObject.toGeoJSON();
   geojson.properties = {
@@ -187,12 +191,12 @@ function beforeSaveItem(){
   if(currentItemName == "Circle"){
     geojson.properties.radius = currentItemObject.getRadius()
   }
-  document.getElementsByName("koordinat")[0].value = JSON.stringify(geojson)
+  document.getElementsByName("geojson")[0].value = JSON.stringify(geojson)
 }
-function switchItemDrawer(name, editable = true){
+function switchItemDrawer(name, edit_mode = false, editable = true){
   var item_style = {{ el(toJSON(tipe_item)) }}
-  map.pm.disableDraw(currentItem);
   currentItemName = name;
+  
   map.pm.removeControls();
   var options = {
     position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
@@ -203,7 +207,7 @@ function switchItemDrawer(name, editable = true){
     drawCircle: false, // adds button to draw a cricle
     cutPolygon: false, // adds button to cut a hole in a polygon
     editMode: editable, // adds button to toggle edit mode for all layers
-    removalMode: !editable, // adds a button to remove layers
+    removalMode: true, // adds a button to remove layers
   };
   for(var x = 0; x < item_style.length; x++){
     if(item_style[x].nm_titem == name){
@@ -212,33 +216,38 @@ function switchItemDrawer(name, editable = true){
       document.getElementById('style_item').appendChild(objectToInput(item_style[x].style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));   
     }
   }
-
-  switch(name){
-    case 'Polygon':
-      options.drawPolygon = true
-    break;
-    case 'Polyline':
-      options.drawPolyline = true
-    break;
-    case 'Rectangle':
-      options.drawRectangle = true
-    break;
-    case 'Circle':
-      options.drawCircle = true
-    break;
-    case 'Marker':
-      options.drawMarker = true
-    break;
+  // Jika edit_mode = true, maka name diubah ke null agar item peta tidak bisa ditambah, melainkan hanya diedit
+  if(!edit_mode){
+    switch(name){
+      case 'Polygon':
+        options.drawPolygon = true
+      break;
+      case 'Polyline':
+        options.drawPolyline = true
+      break;
+      case 'Rectangle':
+        options.drawRectangle = true
+      break;
+      case 'Circle':
+        options.drawCircle = true
+      break;
+      case 'Marker':
+        options.drawMarker = true
+      break;
+    }
   }
   map.pm.addControls(options);
 }
 
 map.on('pm:create', function(e) {
   currentItemObject = e.layer;
+  map.pm.disableDraw();
+  switchItemDrawer(currentItemName, true)
 });
 
 map.on('pm:remove', function(e) {
   currentItemObject = null;
+  switchItemDrawer(currentItemName, false)
 });
 
 @if(!detail.id_item)
@@ -254,8 +263,8 @@ map.on('pm:remove', function(e) {
   document.getElementById('info_item').appendChild(objectToInput({Ibukota: "Jakarta"}, "info_keys", "info_value", "Nama Informasi", "Nilai Informasi", "table_info"));
   
 @else
-  switchItemDrawer({{ detail.tipe_item }});
-  L.geoJSON({{ el(toJSON(detail.koordinat)) }}, {
+  switchItemDrawer("{{ detail.tipe_item }}", true)
+  L.geoJSON({{ el(toJSON(detail.geojson)) }}, {
     onEachFeature: function(feature, layer){
       
       // Mengembalikan value pasca edit ke form
@@ -283,7 +292,10 @@ map.on('pm:remove', function(e) {
       }
       
       // layer yang diedit dioper ke currentItemObject, agar tidak menjadi featurecollection
-      currentItemObject.addTo(map);      
+      currentItemObject.addTo(map);     
+      
+      // fokus ke posisi layer
+      map.fitBounds(currentItemObject.getBounds()) 
     },
     style: function(feature){
       return feature.properties.style

@@ -13,7 +13,8 @@ class PetaController {
       return response.json(peta);
     }else{
       if(params){
-        detail = await Peta.find(params.id);
+        detail = await Db.select().from('daftar_item').where(Peta.primaryKey, params.id).first();
+        console.log(detail);
       }
       return view.render('pages.peta', {detail: detail, tipe_item: TipeItem, kategori_item: KategoriItem});
     }
@@ -23,7 +24,7 @@ class PetaController {
     
     const peta = new Peta();
     peta.nm_item = req.nm_item;
-    peta.koordinat = req.koordinat;
+    peta.geojson = req.geojson;
     peta.id_titem = req.tipe_item;
     peta.id_kitem = req.kategori_item;
     await peta.save();
@@ -36,7 +37,7 @@ class PetaController {
       .update({
         nm_item: req.nm_item,
         id_kitem: req.kategori_item,
-        koordinat: req.koordinat
+        geojson: req.geojson
       });
     response.redirect('/');
   }
