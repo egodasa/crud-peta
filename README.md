@@ -1,5 +1,5 @@
 # Aplikasi CRUD Peta 
-Demo : https://simple-peta-crud-kmyhflgvrb.now.sh/
+Demo : https://simple-peta-crud-ihkxkyqzze.now.sh
 
 ## Made with
 1. NodeJS (AdonisJS framework)
@@ -24,4 +24,4 @@ Demo : https://simple-peta-crud-kmyhflgvrb.now.sh/
 ## Demo
 
 1. Buka terminal dan jalankan perintah `node server.js`
-2. Silahkan buka 127.0.0.1:3333 untuk lokal atau https://simple-peta-crud-kmyhflgvrb.now.sh/ untuk demo online
+2. Silahkan buka 127.0.0.1:3333 untuk lokal atau https://simple-peta-crud-ihkxkyqzze.now.sh untuk demo online
