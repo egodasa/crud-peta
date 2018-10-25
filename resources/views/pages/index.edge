@@ -148,22 +148,26 @@ function showItemPeta(url){
     .then(function(res){
       var r = res.data;
       var l = r.length;
-      for(var x = 0; x < l; x++){
+      if(l != 0){
+        for(var x = 0; x < l; x++){
         var item = null;
         item = L.geoJSON(r[x].geojson,{
-          onEachFeature: ((eachItemPeta).bind(r[x])),
-          style: function(geojson){
-            return geojson.properties.style
-          }
-        })
+            onEachFeature: ((eachItemPeta).bind(r[x])),
+            style: function(geojson){
+              return geojson.properties.style
+            }
+          })
+        }
+        map.fitBounds([
+          layer_overlays.Polygon.getBounds(),
+          layer_overlays.Polyline.getBounds(),
+          layer_overlays.Circle.getBounds(),
+          layer_overlays.Rectangle.getBounds(),
+          layer_overlays.Marker.getBounds()
+        ])
+      }else{
+        window.alert("Tidak ada item peta untuk kategori yang dipilih")
       }
-      map.fitBounds([
-        layer_overlays.Polygon.getBounds(),
-        layer_overlays.Polyline.getBounds(),
-        layer_overlays.Circle.getBounds(),
-        layer_overlays.Rectangle.getBounds(),
-        layer_overlays.Marker.getBounds()
-      ])
     })
   if(layer_control){
     map.removeControl(layer_control)
