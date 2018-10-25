@@ -77,6 +77,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 function previewItemStyle(){
  if(currentItemObject){
   var style = inputToObject(document.getElementsByName("style_keys"), document.getElementsByName("style_value"));
+  style.iconSize = [41, 41]
   if(currentItemName == "Marker"){
     if(style.iconUrl != ""){
       currentItemObject.setIcon(L.icon(style))
@@ -194,7 +195,6 @@ function beforeSaveItem(){
   document.getElementsByName("geojson")[0].value = JSON.stringify(geojson)
 }
 function switchItemDrawer(name, edit_mode = false, editable = true){
-  var item_style = {{ el(toJSON(tipe_item)) }}
   currentItemName = name;
   
   map.pm.removeControls();
@@ -207,17 +207,20 @@ function switchItemDrawer(name, edit_mode = false, editable = true){
     drawCircle: false, // adds button to draw a cricle
     cutPolygon: false, // adds button to cut a hole in a polygon
     editMode: editable, // adds button to toggle edit mode for all layers
-    removalMode: true, // adds a button to remove layers
+    removalMode: !edit_mode, // adds a button to remove layers
   };
-  for(var x = 0; x < item_style.length; x++){
-    if(item_style[x].nm_titem == name){
-      // Membuat form style item
-      document.getElementById('style_item').innerHTML = null
-      document.getElementById('style_item').appendChild(objectToInput(item_style[x].style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));   
-    }
-  }
   // Jika edit_mode = true, maka name diubah ke null agar item peta tidak bisa ditambah, melainkan hanya diedit
   if(!edit_mode){
+    var item_style = {{ el(toJSON(tipe_item)) }}
+    
+    // Form style default diterapkan
+    for(var x = 0; x < item_style.length; x++){
+      if(item_style[x].nm_titem == name){
+        // Membuat form style item
+        document.getElementById('style_item').innerHTML = null
+        document.getElementById('style_item').appendChild(objectToInput(item_style[x].style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));   
+      }
+    }
     switch(name){
       case 'Polygon':
         options.drawPolygon = true
@@ -266,7 +269,7 @@ map.on('pm:remove', function(e) {
   switchItemDrawer("{{ detail.tipe_item }}", true)
   L.geoJSON({{ el(toJSON(detail.geojson)) }}, {
     onEachFeature: function(feature, layer){
-      
+      var tipe_item = "{{ detail.tipe_item }}"
       // Mengembalikan value pasca edit ke form
       document.getElementsByName("nm_item")[0].value = "{{ detail.nm_item }}"
       document.getElementsByName('kategori_item')[0].value = "{{ detail.id_kitem }}"
@@ -283,19 +286,24 @@ map.on('pm:remove', function(e) {
       // Membuat form style item
       document.getElementById('style_item').appendChild(objectToInput(feature.properties.style, "style_keys", "style_value", "Nama Style", "Informasi Style", "table_style", false));
       
-      // ubah layer ke lingkaran jika tipenya adalah circe, geojson tidak bisa menyimpan circle
-      if(feature.properties.radius){
-        currentItemObject = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
-        currentItemObject.setStyle(feature.properties.style);
-      }else{
-        currentItemObject = layer
+      switch(tipe_item){
+        case "Circle":
+          currentItemObject = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
+          currentItemObject.setStyle(feature.properties.style);
+          map.fitBounds(currentItemObject.getBounds())
+        break;
+        case "Marker":
+          currentItemObject = L.marker(layer.getLatLng());
+          currentItemObject.setIcon(L.icon({iconUrl: feature.properties.style.iconUrl, iconSize: [41, 41]}))
+          map.setView(currentItemObject.getLatLng(), 11)
+        break;
+        default:
+          currentItemObject = layer
+          map.fitBounds(currentItemObject.getBounds())
       }
       
       // layer yang diedit dioper ke currentItemObject, agar tidak menjadi featurecollection
       currentItemObject.addTo(map);     
-      
-      // fokus ke posisi layer
-      map.fitBounds(currentItemObject.getBounds()) 
     },
     style: function(feature){
       return feature.properties.style

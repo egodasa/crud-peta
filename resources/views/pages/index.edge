@@ -71,22 +71,33 @@ var list_bounds = []
 // Method untuk setiap layer.
 // this disini didapat dari bind(r[x]) agar nilai dari database dapat dimasukkan ke sini.
 function eachItemPeta(feature, layer){
-  
-  // cek apakah layer termasuk lingkaran atau tidak
-  if(feature.properties.radius){
-    var circle = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
-    circle.setStyle(feature.properties.style);
-    
-    // event lingkaran
-    circle.on('click', (modalDetailPeta).bind(this))
-    
-    layer_overlays[this.tipe_item].addLayer(circle);
-  }else{
-    //Event untuk setiap layer
-    layer.on('click', (modalDetailPeta).bind(this))
-    
-    // Nama tipe layer bersifat baku dan sama dengan penulisan leafletjs. cek variabel layer_overlays dibagian atas
-    layer_overlays[this.tipe_item].addLayer(layer);
+  switch(this.tipe_item){
+    case "Marker":
+      var marker = L.marker(layer.getLatLng());
+      var style = feature.properties.style
+      style.iconSize = [41, 41]
+      marker.setIcon(L.icon(style))
+      
+      // event marker
+      marker.on('click', (modalDetailPeta).bind(this))
+      
+      layer_overlays[this.tipe_item].addLayer(marker);
+    break;
+    case "Circle":
+      var circle = L.circle(layer.getLatLng(), {radius: feature.properties.radius});
+      circle.setStyle(feature.properties.style);
+      
+      // event lingkaran
+      circle.on('click', (modalDetailPeta).bind(this))
+      
+      layer_overlays[this.tipe_item].addLayer(circle);
+    break;
+    default:
+      //Event untuk setiap layer
+      layer.on('click', (modalDetailPeta).bind(this))
+      
+      // Nama tipe layer bersifat baku dan sama dengan penulisan leafletjs. cek variabel layer_overlays dibagian atas
+      layer_overlays[this.tipe_item].addLayer(layer);
   }
 }
 

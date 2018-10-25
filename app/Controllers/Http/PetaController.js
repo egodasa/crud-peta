@@ -14,7 +14,6 @@ class PetaController {
     }else{
       if(params){
         detail = await Db.select().from('daftar_item').where(Peta.primaryKey, params.id).first();
-        console.log(detail);
       }
       return view.render('pages.peta', {detail: detail, tipe_item: TipeItem, kategori_item: KategoriItem});
     }
