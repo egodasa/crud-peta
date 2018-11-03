@@ -47,7 +47,7 @@ CREATE TABLE public.tbl_item_peta (
 );
 
 
-ALTER TABLE public.tbl_item_peta OWNER TO mandan;
+
 
 --
 -- Name: tbl_kategori_item; Type: TABLE; Schema: public; Owner: mandan
@@ -60,7 +60,6 @@ CREATE TABLE public.tbl_kategori_item (
 );
 
 
-ALTER TABLE public.tbl_kategori_item OWNER TO mandan;
 
 --
 -- Name: tbl_tipe_item; Type: TABLE; Schema: public; Owner: mandan
@@ -73,7 +72,6 @@ CREATE TABLE public.tbl_tipe_item (
 );
 
 
-ALTER TABLE public.tbl_tipe_item OWNER TO mandan;
 
 --
 -- Name: daftar_item; Type: VIEW; Schema: public; Owner: mandan
@@ -92,72 +90,49 @@ CREATE VIEW public.daftar_item AS
      JOIN public.tbl_kategori_item c ON ((a.id_kitem = c.id_kitem)));
 
 
-ALTER TABLE public.daftar_item OWNER TO mandan;
 
 --
 -- Name: tbl_item_peta_id_item_seq; Type: SEQUENCE; Schema: public; Owner: mandan
 --
 
-CREATE SEQUENCE public.tbl_item_peta_id_item_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE public.tbl_item_peta_id_item_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 
-ALTER TABLE public.tbl_item_peta_id_item_seq OWNER TO mandan;
+
 
 --
 -- Name: tbl_item_peta_id_item_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mandan
 --
 
-ALTER SEQUENCE public.tbl_item_peta_id_item_seq OWNED BY public.tbl_item_peta.id_item;
 
 
 --
 -- Name: tbl_kategori_item_id_kitem_seq; Type: SEQUENCE; Schema: public; Owner: mandan
 --
 
-CREATE SEQUENCE public.tbl_kategori_item_id_kitem_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE public.tbl_kategori_item_id_kitem_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 
-ALTER TABLE public.tbl_kategori_item_id_kitem_seq OWNER TO mandan;
+
 
 --
 -- Name: tbl_kategori_item_id_kitem_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mandan
 --
 
-ALTER SEQUENCE public.tbl_kategori_item_id_kitem_seq OWNED BY public.tbl_kategori_item.id_kitem;
 
 
 --
 -- Name: tbl_tipe_item_id_titem_seq; Type: SEQUENCE; Schema: public; Owner: mandan
 --
 
-CREATE SEQUENCE public.tbl_tipe_item_id_titem_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE public.tbl_tipe_item_id_titem_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 
-ALTER TABLE public.tbl_tipe_item_id_titem_seq OWNER TO mandan;
 
 --
 -- Name: tbl_tipe_item_id_titem_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mandan
 --
 
-ALTER SEQUENCE public.tbl_tipe_item_id_titem_seq OWNED BY public.tbl_tipe_item.id_titem;
 
 
 --
