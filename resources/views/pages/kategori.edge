@@ -9,11 +9,13 @@
   {{ csrfField() }}
   <p>
     <label>Nama Kategori</label>
-    <input type="text" class="w3-input w3-border" name="nm_kitem" />
+    <input type="text" class="w3-input w3-border" name="nm_kitem" value="{{ old('nm_kitem', '') }}"/>
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('nm_kitem'), hasErrorFor('nm_kitem')) }}
   </p>
   <p>
     <label>Detail Kategori</label>
-    <textarea class="w3-input w3-border" name="detail"></textarea>
+    <textarea class="w3-input w3-border" name="detail">{{ old('detail', '') }}</textarea>
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('detail'), hasErrorFor('detail')) }}
   </p>
   <p>
   <button class="w3-btn w3-blue-grey">Simpan</button>
@@ -25,8 +27,8 @@
 <script>
   document.getElementById('judul_form').innerHTML = "Edit Kategori Peta";
   document.form.action = "{{ route('KategoriItemController.update', {id: detail.id_kitem}) }}?_method=PUT";
-  document.getElementsByName('nm_kitem')[0].value = "{{ detail.nm_kitem }}";
-  document.getElementsByName('detail')[0].innerHTML = "{{ detail.detail }}";
+  document.getElementsByName('nm_kitem')[0].value = "{{ old('nm_kitem', detail.nm_kitem) }}";
+  document.getElementsByName('detail')[0].innerHTML = "{{ old('detail', detail.detail) }}";
 </script>
 @endif
 @endsection
