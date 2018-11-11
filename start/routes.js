@@ -27,3 +27,16 @@ Route.get('/kategori/:id?', 'KategoriItemController.index')
 Route.post('/kategori', 'KategoriItemController.store')
 Route.put('/kategori/:id/edit', 'KategoriItemController.update')
 Route.delete('/kategori/:id', 'KategoriItemController.remove')
+
+//Route halaman pengaturan
+Route.get('/pengaturan', 'PengaturanController.showPengaturan').middleware('user');
+
+//route login
+Route.get('/login', 'LoginController.showLogin').middleware('tamu')
+Route.post('/login', 'LoginController.checkLogin').middleware('tamu')
+
+//route logout
+Route.get('/logout', async ({auth, response})=>{
+  await auth.logout();
+  response.redirect('/');
+}).middleware('user')

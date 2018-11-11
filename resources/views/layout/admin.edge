@@ -27,7 +27,12 @@
       <img src="/images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
     </div>
     <div class="w3-col s8 w3-bar">
-      <span>Welcome, <strong>User</strong></span><br>
+      @loggedIn
+        <span>Welcome, <strong>{{ auth.user.username }}</strong></span><br>
+        <span><a href="/logout">Logout</a><br>
+      @else
+        <span>Welcome, <strong>User</strong></span><br>
+      @endloggedIn
     </div>
   </div>
   <hr>
@@ -39,6 +44,7 @@
     <a href="/" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>&nbsp; Lihat Peta</a>
     <a href="{{ route('PetaController.index') }}" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>&nbsp; Kelola Item Peta</a>
     <a href="{{ route('KategoriItemController.index') }}" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>&nbsp; Kelola Kategori Peta</a>
+    <a href="{{ route('PengaturanController.showPengaturan') }}" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>&nbsp; Pengaturan</a>
   </div>
   <div class="w3-container">
     <h5>Credit</h5>

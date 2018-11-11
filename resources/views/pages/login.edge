@@ -1,0 +1,27 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2>Login</h2>
+<form name="form" class="w3-margin" method="POST" action="{{ route('LoginController.checkLogin') }}">
+  @if(flashMessage('message'))
+    <p>
+      <span class="w3-text-red">{{ flashMessage('message') }}</span>
+    </p>
+  @endif
+  {{ csrfField() }}
+  <p>
+    <label>Username</label>
+    <input type="text" class="w3-input w3-border" name="username" />
+  </p>
+  <p>
+    <label>Password</label>
+    <input type="password" class="w3-input w3-border" name="password" />
+  </p>
+  <p>
+  <button class="w3-btn w3-blue-grey">Login</button>
+  </p>
+</form>
+@endsection

@@ -1,0 +1,22 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2>Halaman Pengaturan</h2>
+<form name="form" class="w3-margin" method="POST" action="{{ route('LoginController.checkLogin') }}">
+  {{ csrfField() }}
+  <p>
+    <label>Nama property untuk informasi GeoJSON</label>
+    <input type="text" class="w3-input w3-border" name="properti" />
+  </p>
+  <p>
+    <label>Nama property untuk style GeoJSON</label>
+    <input type="text" class="w3-input w3-border" name="style" />
+  </p>
+  <p>
+  <button class="w3-btn w3-blue-grey">Simpan</button>
+  </p>
+</form>
+@endsection
