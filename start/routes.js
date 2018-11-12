@@ -17,6 +17,11 @@
 const Route = use('Route')
 Route.get('/', 'IndexController.index')
 
+Route.get('/pengguna/:id?', 'PenggunaController.index').middleware('user')
+Route.post('/pengguna', 'PenggunaController.store').middleware('user').validator('storePengguna')
+Route.put('/pengguna/:id/edit', 'PenggunaController.update').middleware('user').validator('updatePengguna')
+Route.delete('/pengguna/:id', 'PenggunaController.remove').middleware('user')
+
 Route.get('/peta/:id?', 'PetaController.index')
 Route.post('/peta', 'PetaController.store').validator('storePeta')
 Route.put('/peta/:id/edit', 'PetaController.update').validator('updatePeta')

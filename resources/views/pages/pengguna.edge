@@ -1,0 +1,41 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2 id="judul_form">Tambah Pengguna</h2>
+<form name="form" class="w3-margin" method="POST" action="{{ route('PenggunaController.index') }}">
+  {{ csrfField() }}
+  <p>
+    <label>Username</label>
+    <input type="text" class="w3-input w3-border" name="username" value="{{ old('username', '') }}"/>
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}
+  </p>
+  <p>
+    <label>Email</label>
+    <input type="email" class="w3-input w3-border" name="email" value="{{ old('email', '') }}"/>
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}
+  </p>
+  <p>
+    <label>Password</label>
+    <input type="password" class="w3-input w3-border" name="password" value="{{ old('password', '') }}"/>
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}
+  </p>
+
+  <p>
+  <button class="w3-btn w3-blue-grey">Simpan</button>
+  </p>
+</form>
+@if(!detail.id_user)
+  @!component('table', {datatable: datatable})
+@else
+<script>
+  document.getElementById('judul_form').innerHTML = "Edit User";
+  document.form.action = "{{ route('PenggunaController.update', {id: detail.id_user}) }}?_method=PUT";
+  document.getElementsByName('username')[0].value = "{{ old('username', detail.username) }}";
+  document.getElementsByName('email')[0].value = "{{ old('email', detail.email) }}";
+  document.getElementsByName('username')[0].disabled = true;
+</script>
+@endif
+@endsection
