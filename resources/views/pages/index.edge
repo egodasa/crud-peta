@@ -75,8 +75,13 @@ function eachItemPeta(feature, layer){
     case "Marker":
       var marker = L.marker(layer.getLatLng());
       var style = feature.properties.style
-      style.iconSize = [41, 41]
-      marker.setIcon(L.icon(style))
+      
+      // Jika iconurl kosong, maka set ke default iconnya
+      // Biasanya kosong karena user lupa
+      if(style.iconUrl.length != 0){
+        style.iconSize = [41, 41]
+        marker.setIcon(L.icon(style))
+      }
       
       // event marker
       marker.on('click', (modalDetailPeta).bind(this))
