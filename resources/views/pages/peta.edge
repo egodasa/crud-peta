@@ -11,7 +11,7 @@
 
 @section('content')
 <h2 id="judul_form">Tambah Item Peta Baru</h2>
-<form name="form" class="w3-margin" method="POST" onsubmit="beforeSaveItem()" action="{{ route('PetaController.index') }}">
+<form name="form" class="w3-margin" method="POST" onsubmit="beforeSaveItem()" action="{{ route('PetaController.index') }}" enctype="multipart/form-data">
   {{ csrfField() }}
   <p>
     <label>Nama Item Peta</label>
@@ -53,6 +53,11 @@
   <p>
     <label>Style Item</label>
     <div id="style_item"></div>
+  </p>
+  <p>
+    <label>Foto</label>
+    <input type="file" class="w3-input w3-border" name="foto" />
+    {{ elIf('<span class="w3-text-red">$self</span>', getErrorFor('foto'), hasErrorFor('foto')) }}
   </p>
     <input type="hidden" type="text" name="geojson"  value="{{ old('geojson', '') }}" />
   <p>

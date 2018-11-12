@@ -3,11 +3,7 @@
 const KategoriItem = use('App/Models/KategoriItem')
 let Datatable = use('App/Controllers/Http/Datatable')
 let Column = use('App/Controllers/Http/Column')
-const { validate } = use('Validator')
-const rules = {
-  nm_kitem: 'required',
-  detail: 'required'
-}
+
 
 class KategoriItemController {
   async index({view, request, response, params, session}){
@@ -46,32 +42,21 @@ class KategoriItemController {
   }
   async store({request, view, response, session}){
     const req = request.post();
-    const validation = await validate(req, rules);
-    if(validation.fails()){
-       session.withErrors(validation.messages()).flashAll();
-    }else{
-      const kategoriItem = new KategoriItem();
-      kategoriItem.nm_kitem = req.nm_kitem;
-      kategoriItem.detail = req.detail;
-      await kategoriItem.save();
-    }
+    const kategoriItem = new KategoriItem();
+    kategoriItem.nm_kitem = req.nm_kitem;
+    kategoriItem.detail = req.detail;
+    await kategoriItem.save();
     return response.redirect('/kategori');
   }
   async update({request, response, params, session}){
     const req = request.post();
-    const validation = await validate(req, rules);
-    if(validation.fails()){
-       session.withErrors(validation.messages()).flashAll();
-       response.redirect(`/kategori/${params.id}`);
-    }else{
-      await KategoriItem.query()
-        .where(KategoriItem.primaryKey, params.id)
-        .update({
-          nm_kitem: req.nm_kitem,
-          detail: req.detail
-        });
-      response.redirect('/kategori');
-    }
+    await KategoriItem.query()
+      .where(KategoriItem.primaryKey, params.id)
+      .update({
+        nm_kitem: req.nm_kitem,
+        detail: req.detail
+      });
+    response.redirect('/kategori');
   }
   async remove({params, response}){
     await KategoriItem.query()

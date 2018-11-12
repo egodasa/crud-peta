@@ -1,15 +1,10 @@
 'use strict'
 
 const Peta = use('App/Models/Peta')
+const Foto = use('App/Models/Gambar')
+const Database = use('Database')
 const Db = use('Database')
-const { validate } = use('Validator')
-const rules = {
-  nm_item: 'required',
-  geojson: 'required',
-  tipe_item: 'required',
-  kategori_item: 'required'
-}
-
+const Helpers = use('Helpers')
 
 class PetaController {
   async index({view, request, response, params, session}){
@@ -28,39 +23,42 @@ class PetaController {
   }
   async store({request, view, response, session}){
     const req = request.post();
-    const validation = await validate(req, rules);
-    if(validation.fails()){
-      session.withErrors(validation.messages()).flashAll();
+    const fileFoto = request.file('foto');
+  
+    await fileFoto.move(Helpers.tmpPath('uploads'), {
+      name: `${new Date().getTime()}.jpg`,
+      overwrite: true
+    })
+    const peta = {
+      nm_item: req.nm_item,
+      geojson: req.geojson,
+      id_titem: req.tipe_item,
+      id_kitem: req.kategori_item
     }
-    else{
-      const peta = new Peta();
-      peta.nm_item = req.nm_item;
-      peta.geojson = req.geojson;
-      peta.id_titem = req.tipe_item;
-      peta.id_kitem = req.kategori_item;
-      await peta.save();
-    }
+    
+    const trx = await Database.beginTransaction()
+    
+    const foto = new Foto();
+    foto.id_item = await trx.insert(peta).into('tbl_item_peta').returning('id_item');
+    foto.id_item = parseInt(foto.id_item);
+    
+    foto.nm_gambar = fileFoto.fileName;
+    
+    await foto.save(trx);
+    
+    trx.commit();
     response.redirect('/');
   }
   async update({request, response, params, session}){
     const req = request.post();
-    
-    delete rules.tipe_item;
-    const validation = await validate(req, rules);
-    if(validation.fails()){
-      session.withErrors(validation.messages()).flashAll();
-      response.redirect(`/peta/${params.id}`);
-    }
-    else{
-      await Peta.query()
-        .where(Peta.primaryKey, params.id)
-        .update({
-          nm_item: req.nm_item,
-          id_kitem: req.kategori_item,
-          geojson: req.geojson
-        });
-      response.redirect('/');
-    }
+    await Peta.query()
+      .where(Peta.primaryKey, params.id)
+      .update({
+        nm_item: req.nm_item,
+        id_kitem: req.kategori_item,
+        geojson: req.geojson
+      });
+    response.redirect('/');
   }
   async remove({params, response}){
     await Peta.query()

@@ -18,14 +18,14 @@ const Route = use('Route')
 Route.get('/', 'IndexController.index')
 
 Route.get('/peta/:id?', 'PetaController.index')
-Route.post('/peta', 'PetaController.store')
-Route.put('/peta/:id/edit', 'PetaController.update')
+Route.post('/peta', 'PetaController.store').validator('storePeta')
+Route.put('/peta/:id/edit', 'PetaController.update').validator('updatePeta')
 Route.delete('/peta/:id', 'PetaController.remove')
 Route.get('/peta/kategori/:id', 'PetaController.petaByKategori')
 
 Route.get('/kategori/:id?', 'KategoriItemController.index')
-Route.post('/kategori', 'KategoriItemController.store')
-Route.put('/kategori/:id/edit', 'KategoriItemController.update')
+Route.post('/kategori', 'KategoriItemController.store').validator('storeKategoriPeta')
+Route.put('/kategori/:id/edit', 'KategoriItemController.update').validator('storeKategoriPeta')
 Route.delete('/kategori/:id', 'KategoriItemController.remove')
 
 //Route halaman pengaturan
