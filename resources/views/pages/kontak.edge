@@ -1,0 +1,29 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2>Hubungi Kami</h2>
+  @if(flashMessage('email_message'))
+    <span class="w3-text-teal">{{ flashMessage('email_message') }}</span>
+  @endif 
+<form name="form" class="w3-margin" method="POST" action="{{ route('FormKontakController.sendEmail') }}">
+  {{ csrfField() }}
+  <p>
+    <label>Nama</label>
+    <input type="text" class="w3-input w3-border" name="nm" />
+  </p>
+  <p>
+    <label>Email</label>
+    <input type="email" class="w3-input w3-border" name="email" />
+  </p>
+  <p>
+    <label>Isi Pesan</label>
+    <textarea class="w3-input w3-border" name="pesan"></textarea>
+  </p>
+  <p>
+  <button class="w3-btn w3-blue-grey">Kirim Pesan</button>
+  </p>
+</form>
+@endsection

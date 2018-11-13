@@ -24,28 +24,28 @@ class PetaController {
   async store({request, view, response, session}){
     const req = request.post();
     const fileFoto = request.file('foto');
-  
-    await fileFoto.move(Helpers.tmpPath('uploads'), {
-      name: `${new Date().getTime()}.jpg`,
-      overwrite: true
-    })
     const peta = {
       nm_item: req.nm_item,
       geojson: req.geojson,
       id_titem: req.tipe_item,
       id_kitem: req.kategori_item
     }
-    
     const trx = await Database.beginTransaction()
     
-    const foto = new Foto();
-    foto.id_item = await trx.insert(peta).into('tbl_item_peta').returning('id_item');
-    foto.id_item = parseInt(foto.id_item);
-    
-    foto.nm_gambar = fileFoto.fileName;
-    
-    await foto.save(trx);
-    
+    // Foto tidak wajib ada
+    if(fileFoto){
+      await fileFoto.move(Helpers.tmpPath('uploads'), {
+        name: `${new Date().getTime()}.jpg`,
+        overwrite: true
+      })
+      const foto = new Foto();
+      foto.id_item = await trx.insert(peta).into('tbl_item_peta').returning('id_item');
+      foto.id_item = parseInt(foto.id_item);
+      foto.nm_gambar = fileFoto.fileName;
+      await foto.save(trx);
+    }else{
+      await trx.insert(peta).into('tbl_item_peta').returning('id_item');
+    }
     trx.commit();
     response.redirect('/');
   }

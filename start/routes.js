@@ -36,6 +36,10 @@ Route.delete('/kategori/:id', 'KategoriItemController.remove')
 //Route halaman pengaturan
 Route.get('/pengaturan', 'PengaturanController.showPengaturan').middleware('user');
 
+//Route hubungi kam
+Route.get('/hubungi-kami', 'FormKontakController.index');
+Route.post('/hubungi-kami/kirim', 'FormKontakController.sendEmail');
+
 //route login
 Route.get('/login', 'LoginController.showLogin').middleware('tamu')
 Route.post('/login', 'LoginController.checkLogin').middleware('tamu')
