@@ -52,6 +52,4 @@ Route.get('/logout', async ({auth, response})=>{
 
 
 // Route chat, untuk belajar websocker
-Route.get('/chat', ({view})=>{
-  return view.render('pages.chat');
-})
+Route.get('/chat', 'ChatController.index')
