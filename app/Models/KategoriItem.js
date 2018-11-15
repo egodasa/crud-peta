@@ -16,8 +16,8 @@ class KategoriItem extends Model {
   static get updatedAtColumn () {
     return null
   }
-  listItemPeta(){
-    this.hasMany('App/Models/Peta');
+  itemPeta(){
+    this.belongsTo('App/Models/Peta', this.primaryKey, 'id_kitem');
   }
 }
 

@@ -16,6 +16,9 @@ class TipeItem extends Model {
   static get updatedAtColumn () {
     return null
   }
+  itemPeta(){
+    this.belongsTo('App/Models/Peta', this.primaryKey, 'id_titem');
+  }
 }
 
 module.exports = TipeItem
