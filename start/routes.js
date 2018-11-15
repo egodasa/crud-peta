@@ -49,3 +49,9 @@ Route.get('/logout', async ({auth, response})=>{
   await auth.logout();
   response.redirect('/');
 }).middleware('user')
+
+
+// Route chat, untuk belajar websocker
+Route.get('/chat', ({view})=>{
+  return view.render('pages.chat');
+})

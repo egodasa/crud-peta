@@ -1,0 +1,109 @@
+@layout('layout.admin')
+
+@section('head')
+@endsection
+
+@section('content')
+<h2>Chat</h2>
+<a class="w3-button w3-light-gray" id="connection_status">Tidak Terhubung</a>
+<p class="w3-container w3-border w3-light-gray" id="message_container">
+</p>
+<p>
+  <label>Isi Pesan</label>
+  <textarea class="w3-input w3-border" id="pesan"></textarea>
+</p>
+<p>
+  <button class="w3-button w3-blue-gray" id="send_btn">Kirim</button>
+</p>
+
+{{ script('https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js') }}
+{{ script('https://unpkg.com/@adonisjs/websocket-client@1.0.9/dist/Ws.browser.js') }}
+<script>
+var ws = null;
+var connection_status = false;
+
+// Method untuk merender baris pesan baru
+function messagesRow(text, align = 'right', color = 'light-gray'){
+  var line = document.createElement('p');
+  var row = document.createElement('a');
+  row.setAttribute('class', 'w3-button w3-block w3-' + align + '-align w3-' + color);
+  row.innerHTML = text;
+  line.appendChild(row)
+  return line
+}
+
+// Method untuk menambah pesan baru
+// type : self berarti pesan dari diri sendiri, incoming berarti pesan masuk
+function newMessages(message, type = 'self'){
+  if(type == 'self'){
+    document.getElementById('message_container').appendChild(messagesRow(message, 'right', 'light-green'));
+  }else{
+    document.getElementById('message_container').appendChild(messagesRow(message, 'left', 'khaki'));
+  }
+}
+
+// Melakukan koneksi ke websocket server
+function connectToSocket() {
+  ws = adonis.Ws().connect()
+  document.getElementById('connection_status').innerHTML = 'Mencoba Terhubung';
+  
+  // Event jika koneksi berhasil
+  ws.on('open', function(){
+    connection_status = true
+    document.getElementById('connection_status').setAttribute('class', 'w3-button w3-teal');
+    document.getElementById('connection_status').innerHTML = 'Terhubung';
+    
+    // Method untuk terhubung ke chanel socket
+    subscribeToChannel();
+  })
+  
+  // Event jika gagal terhubung
+  ws.on('error', function(){
+    document.getElementById('connection_status').setAttribute('class', 'w3-button w3-red');
+    document.getElementById('connection_status').innerHTML = 'Error';
+  })
+  
+  // Event jika koneksi ditutup
+  ws.on('close', function(){
+    connection_status = false
+  })
+}
+
+// Method untuk terhubung dengan chanel
+// Sebelumnya harus terhubung ke websocket dulu
+function subscribeToChannel() {
+
+  // chat adalah nama chanel yang sudah dibuat diserver
+  // lokasi chanel di controller/ws
+  var chat = ws.subscribe('chat')
+  
+  // Event jika gagal konek ke chanel
+  chat.on('error', function(){
+    document.getElementById('connection_status').setAttribute('class', 'w3-button w3-red');
+    document.getElementById('connection_status').innerHTML = 'Error';
+  })
+  
+  // Event 'message' terdapat didalam controller chat di folder ws
+  chat.on('message', function(message){
+    newMessages(message, 'incoming');
+  })
+}
+
+// Event
+
+// Mengirim Pesan
+document.getElementById('send_btn').addEventListener('click', function(){
+  
+  // Mendengarkan pesan baru dari chanel chat
+  // dan menjalankan event 'message' dari chanel chat
+  ws.getSubscription('chat').emit('message', document.getElementById('pesan').value);
+  newMessages(document.getElementById('pesan').value);
+  document.getElementById('pesan').value = "";
+})
+
+// TOmbol untuk konek ke socket
+document.getElementById('connection_status').addEventListener('click', function(){
+  connectToSocket();
+})
+</script>
+@endsection
